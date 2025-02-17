@@ -59,12 +59,12 @@ Verse * createVerse();
 
 /**
  * @brief create an empty reference struct
- * @param book pointer to the book its in
- * @param chapter pointer to the chapter its in
+ * @param book the number of the book its in
+ * @param chapter the number of the chapter its in
  * @param verseNum the number of this verse
- * @return pointer to the new reference
+ * @return the new reference
  */
-Reference * createReference(Book * book, Chapter * chapter, int verseNum);
+Reference createReference(int bookNum, int chapterNum, int verseNum);
 
 /**
  * @brief free a bible struct
@@ -98,10 +98,11 @@ void freeReference(Reference * ref);
 
 /**
  * @brief get a specific book
+ * @param bible pointer to the bible
  * @param bookName name of the book
  * @return pointer to the appropriate book
  */
-Book * getBook(char * bookName);
+Book * getBook(Bible * bible, char * bookName);
 
 /**
  * @brief get a specific chapter
@@ -113,23 +114,26 @@ Chapter * getChapter(Book * book, int index);
 
 /**
  * @brief get a specific verse based on its reference
+ * @param bible pointer to the bible
  * @param reference string with the verse's reference
  * @return pointer to the appropriate verse
  */
-Verse * getVerse(char * reference);
+Verse * getVerse(Bible * bible, char * reference);
 
 /**
  * @brief create a reference string based on the reference
+ * @param bible pointer to the bible
  * @param ref pointer to the reference struct
  * @return string with the reference
  */
-char * refString(Reference * ref);
+char * refString(Bible * bible, Reference * ref);
 
 /**
  * @brief search all verses in the bible for a query string
+ * @param bible pointer to the bible
  * @param query the string to search for
  * @return vector with all of the verses containing that query
  */
-ListTemplate searchVerses(char * query);
+ListTemplate * searchVerses(Bible * bible, char * query);
 
 #endif
