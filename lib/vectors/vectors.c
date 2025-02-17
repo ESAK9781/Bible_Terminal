@@ -68,13 +68,16 @@ void * _getVal(ListTemplate * list, int index) {
 
 void * _pop(ListTemplate * list) {
     if (list->size == 0) {
+        printf("ERROR: Cannot pop from empty list\n");
         return NULL;
     }
 
     ListLink * link = list->head;
     list->head = link->next;
     list->size--;
-    list->head->prev = NULL;
+    if (list->head != NULL) {
+        list->head->prev = NULL;
+    }
     
     void * value = link->value;
     free(link);

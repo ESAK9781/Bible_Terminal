@@ -58,7 +58,7 @@ Bible * createBible(char * txtPath) {
 
             int verseLength = strlen(line) - 1; // -2 for newline and identifier, +1 for null char
             nextVerse->text = calloc(verseLength, sizeof(char));
-            strncpy(nextVerse->text, line, verseLength - 1);
+            strncpy(nextVerse->text, &line[1], verseLength - 1);
             nextVerse->text[verseLength - 1] = '\0';
 
             _append(currentChapter->verses, nextVerse);

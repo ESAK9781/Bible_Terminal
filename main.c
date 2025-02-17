@@ -11,7 +11,9 @@ int main(int nArgs, char ** args) {
     printf("Running...\n");
     Bible * bible = createBible("./res/KJV_C.txt");
     printf("Bible loaded!\n");
-    printf("Genesis 2:1 -- %s\n", getVerse(bible, "Genesis 2:1")->text);
+    char testRef[] = "1 Peter 4:9";
+    printf("%s -- %s\n", testRef, getVerse(bible, testRef)->text);
+    printf("Reference: %s\n", refString(bible, &getVerse(bible, testRef)->ref));
     freeBible(bible);
     printf("Testing complete!\n");
 }
