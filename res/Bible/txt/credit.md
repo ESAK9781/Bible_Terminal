@@ -1,0 +1,1 @@
+# Source: https://openbible.com/textfiles/kjv.txt
