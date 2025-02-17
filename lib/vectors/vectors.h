@@ -1,161 +1,115 @@
-#include "./vectors.h"
+#pragma once
 
-ListLink * _createLink(void * value) {
-    ListLink * out = malloc(sizeof(ListLink));
-    out->next = NULL;
-    out->prev = NULL;
-    out->value = value;
-    return out;
-}
+#include <stdlib.h>
+#include <stdio.h>
 
-ListTemplate * _createList() {
-    ListTemplate * out = malloc(sizeof(ListTemplate));
-    out->head = NULL;
-    out->tail = NULL;
-    out->size = 0;
-    return out;
-}
+typedef struct _Link_Struct {
+    struct _Link_Struct * next;
+    struct _Link_Struct * prev;
+    void * value;
+} ListLink;
 
-void _chainTogether(ListLink * a, ListLink * b) {
-    a->next = b;
-    b->prev = a;
-}
+typedef struct _List_Struct {
+    ListLink * head;
+    ListLink * tail;
+    int size;
+} ListTemplate;
 
-void _deleteLink(ListLink * link) {
-    free(link->value);
-    free(link);
-}
+/**
+ * @brief create a list link whose value is stored at the pointer
+ * @param value pointer to the value of the link
+ * @return pointer to the new link
+ */
+ListLink * _createLink(void * value);
 
-void _deleteList(ListTemplate * list) {
-    ListLink * current = list->head;
-    for (int i = 0; i < list->size; i++) {
-        ListLink * temp = current->next;
-        _deleteLink(current);
-        current = temp;
-    }
+/**
+ * @brief create a list wrapper
+ * @return pointer to the new list wrapper
+ */
+ListTemplate * _createList();
 
-    free(list);
-}
+/**
+ * @brief corrects the pointers of two links so the first one comes after the second
+ * @param a pointer to the first link
+ * @param b pointer to the second link
+ */
+void _chainTogether(ListLink * a, ListLink * b);
 
-int _getLen(ListTemplate * list) {
-    return list->size;
-}
+/**
+ * @brief free the memory associated with a link
+ * @param link pointer to the link to free
+ */
+void _deleteLink(ListLink * link);
 
-ListLink * _getLink(ListTemplate * list, int index) {
-    if ((index >= list->size) || index < 0) {
-        printf("ERROR: Could not get link at %d, index out of range\n", index);
-        return NULL;
-    }
+/**
+ * @brief free the memory associated with a list and all its links
+ * @param list pointer to the list
+ */
+void _deleteList(ListTemplate * list);
 
-    if (index > (list->size / 2)) {
-        ListLink * place = list->tail;
-        for (int i = 0; i < list->size - index - 1; i++) {
-            place = place->prev;
-        }
-        return place;
-    }
+/**
+ * @brief get the length of a list
+ * @param list pointer to the list
+ * @return number of elements in the list
+ */
+int _getLen(ListTemplate * list);
 
-    ListLink * place = list->head;
-    for (int i = 0; i < index; i++) {
-        place = place->next;
-    }
-    return place;
-}
+/**
+ * @brief retrieve a link at a certain index
+ * @param list pointer to the list
+ * @param index the index to retrieve
+ * @return pointer to that link
+ */
+ListLink * _getLink(ListTemplate * list, int index);
 
-void * _getVal(ListTemplate * list, int index) {
-    return _getLink(list, index)->value;
-}
+/**
+ * @brief retrieve the value at a certain index
+ * @param list pointer to the list
+ * @param index index to retrieve
+ * @return pointer to the value of that link
+ */
+void * _getVal(ListTemplate * list, int index);
 
-void * _pop(ListTemplate * list) {
-    if (list->size == 0) {
-        return NULL;
-    }
+/**
+ * @brief retrieve and remove the link at the beginning of the list
+ * @param list pointer to the list
+ * @return pointer to the value
+ */
+void * _pop(ListTemplate * list);
 
-    ListLink * link = list->head;
-    list->head = link->next;
-    list->size--;
-    list->head->prev = NULL;
-    
-    void * value = link->value;
-    free(link);
+/**
+ * @brief insert an element into the list at a specified index
+ * @param list pointer to the list
+ * @param value value to insert
+ * @param index index to insert at
+ */
+void _insert(ListTemplate * list, void * value, int index);
 
-    return value;
-}
+/**
+ * @brief add an element to the end of the list
+ * @param list pointer to the list
+ * @param value value to append
+ */
+void _append(ListTemplate * list, void * value);
 
-void _insert(ListTemplate * list, void * value, int index) {
-    if ((index > list->size) || (index < 0)) {
-        printf("ERROR: Cannot insert at %d, index out of range\n", index);
-        return;
-    }
+/**
+ * @brief add an element to the front of the list
+ * @param list pointer to the list
+ * @param value pointer to the value
+ */
+void _push(ListTemplate * list, void * value);
 
-    ListLink * newLink = _createLink(value);
-    
+/**
+ * @brief retrieve and remove an element from the specified index
+ * @param list pointer to the list
+ * @param index index to retrieve at
+ * @return pointer to the value
+ */
+void * _popAt(ListTemplate * list, int index);
 
-    if (list->size == 0) {
-        list->head = newLink;
-        list->tail = newLink;
-        list->size++;
-        return;
-    }
-
-    if (index == 0) {
-        _chainTogether(newLink, list->head);
-        list->head = newLink->next;
-        list->size++;
-        return;
-    }
-
-    if (index == list->size) {
-        _chainTogether(list->tail, newLink);
-        list->tail = newLink;
-        list->size++;
-        return;
-    }
-
-    ListLink * before = _getLink(list, index);
-    ListLink * after = before->next;
-    _chainTogether(before, newLink);
-    _chainTogether(newLink, after);
-    list->size++;
-    return;
-}
-
-void _append(ListTemplate * list, void * value) {
-    _insert(list, value, list->size);
-}
-
-void _push(ListTemplate * list, void * value) {
-    _insert(list, value, 0);
-}
-
-void * _popAt(ListTemplate * list, int index) {
-    if ((index < 0) || (index >= list->size)) {
-        printf("ERROR: Could not pop index %d, index out of range\n", index);
-    }
-
-    if (index == 0) {
-        return _pop(list);
-    }
-
-    if (index == list->size - 1) {
-        ListLink * link = list->tail;
-        void * value = link->value;
-        list->tail = link->prev;
-        free(link);
-        return value;
-    }
-
-    ListLink * link = _getLink(list, index);
-    ListLink * before = link->prev;
-    ListLink * after = link->next;
-    _chainTogether(before, after);
-
-    void * value = link->value;
-    free(link);
-    return value;
-}
-
-void _deleteAt(ListTemplate * list, int index) {
-    void * value = _popAt(list, index);
-    free(value);
-}
+/**
+ * @brief delete the node at a specified index
+ * @param list pointer to the list
+ * @param index index to delete at
+ */
+void _deleteAt(ListTemplate * list, int index);
