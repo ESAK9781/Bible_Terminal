@@ -9,7 +9,6 @@ typedef struct _bible_struct {
 } Bible;
 
 typedef struct _reference_struct {
-    Bible * bible;
     unsigned char book;
     unsigned char chapter;
     unsigned char verse;
@@ -67,6 +66,13 @@ Verse * createVerse();
 Reference createReference(int bookNum, int chapterNum, int verseNum);
 
 /**
+ * @brief clone a verse reference struct
+ * @param ref previous reference
+ * @return pointer to cloned reference
+ */
+Reference * cloneReference(Reference ref);
+
+/**
  * @brief free a bible struct
  * @param bible pointer to the bible struct
  */
@@ -121,6 +127,14 @@ Chapter * getChapter(Book * book, int index);
 Verse * getVerse(Bible * bible, char * reference);
 
 /**
+ * @brief get a specific verse based on its reference struct
+ * @param bible pointer to the bible
+ * @param ref pointer to the verse's reference struct
+ * @return pointer to the appropriate verse
+ */
+Verse * rGetVerse(Bible * bible, Reference * ref);
+
+/**
  * @brief create a reference string based on the reference
  * @param bible pointer to the bible
  * @param ref pointer to the reference struct
@@ -132,7 +146,7 @@ char * refString(Bible * bible, Reference * ref);
  * @brief search all verses in the bible for a query string
  * @param bible pointer to the bible
  * @param query the string to search for
- * @return vector with all of the verses containing that query
+ * @return vector with all of the references of verses containing that query
  */
 ListTemplate * searchVerses(Bible * bible, char * query);
 

@@ -1,4 +1,5 @@
 #include "../vectors/vectors.h"
+#include "../searchUtil/searchUtil.h"
 #include "bible.h"
 #include <string.h>
 
@@ -114,6 +115,17 @@ Reference createReference(int bookNum, int chapterNum, int verseNum) {
     out.book = bookNum;
     out.chapter = chapterNum;
     out.verse = verseNum;
+    return out;
+}
+
+/**
+ * @brief clone a verse reference struct
+ * @param ref previous reference
+ * @return pointer to cloned reference
+ */
+Reference * cloneReference(Reference ref) {
+    Reference * out = malloc(sizeof(Reference));
+    *out = ref;
     return out;
 }
 
@@ -265,6 +277,19 @@ Verse * getVerse(Bible * bible, char * reference) {
 }
 
 /**
+ * @brief get a specific verse based on its reference struct
+ * @param bible pointer to the bible
+ * @param ref pointer to the verse's reference struct
+ * @return pointer to the appropriate verse
+ */
+Verse * rGetVerse(Bible * bible, Reference * ref) {
+    Book * book = _getVal(bible->books, ref->book);
+    Chapter * chapter = _getVal(book->chapters, ref->chapter);
+    Verse * verse = _getVal(chapter->verses, ref->verse);
+    return verse;
+}
+
+/**
  * @brief create a reference string based on the reference
  * @param bible pointer to the bible
  * @param ref pointer to the reference struct
@@ -282,9 +307,33 @@ char * refString(Bible * bible, Reference * ref) {
  * @brief search all verses in the bible for a query string
  * @param bible pointer to the bible
  * @param query the string to search for
- * @return vector with all of the verses containing that query
+ * @return vector with all of the references of verses containing that query
  */
 ListTemplate * searchVerses(Bible * bible, char * query) {
-    return NULL;
+    ListTemplate * out = _createList();
+
+    ListLink * bookLink = bible->books->head;
+    while (bookLink != NULL) {
+
+        ListLink * chapterLink = ((Book *) bookLink->value)->chapters->head;
+        while (chapterLink != NULL) {
+
+            ListLink * verseLink = ((Chapter *) chapterLink->value)->verses->head;
+
+            while (verseLink != NULL) {
+                if (searchString(((Verse *) verseLink->value)->text, query) != -1) {
+                    _append(out, cloneReference(((Verse *) verseLink->value)->ref));
+                }
+
+                verseLink = verseLink->next;
+            }
+
+            chapterLink = chapterLink->next;
+        }
+
+        bookLink = bookLink->next;
+    }
+
+    return out;
 }
 
